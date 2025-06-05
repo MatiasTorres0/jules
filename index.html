@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="video-container">
+            <video id="iptv-video" controls autoplay width="100%"></video>
+        </div>
+        <div class="controls-container">
+            <button id="play-pause-btn">Play/Pause</button>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1">
+            <button id="fullscreen-btn">Fullscreen</button>
+        </div>
+        <div class="channel-list-container">
+            <h2>Channel List</h2>
+            <ul id="channel-list">
+                <!-- Channels will be populated by JavaScript -->
+            </ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

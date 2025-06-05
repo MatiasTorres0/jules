@@ -1,0 +1,131 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.video-container {
+    width: 100%;
+    max-width: 800px; /* Limit video width */
+    background-color: #000;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#iptv-video {
+    display: block; /* Remove extra space below video */
+}
+
+.controls-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.controls-container button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.controls-container button:hover {
+    background-color: #0056b3;
+}
+
+.controls-container input[type="range"] {
+    cursor: pointer;
+}
+
+.channel-list-container {
+    width: 100%;
+    max-width: 800px; /* Match video width */
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.channel-list-container h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #007bff;
+}
+
+#channel-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px; /* Limit height and make it scrollable */
+    overflow-y: auto;
+}
+
+#channel-list li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#channel-list li:last-child {
+    border-bottom: none;
+}
+
+#channel-list li:hover {
+    background-color: #e9ecef;
+}
+
+#channel-list li.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+/* Basic responsiveness */
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .video-container {
+        flex: 3; /* Takes more space */
+        margin-bottom: 0;
+    }
+
+    .channel-list-container {
+        flex: 1; /* Takes less space */
+        max-height: 500px; /* Adjust height for desktop */
+    }
+
+    .controls-container {
+        /* Place controls below video on larger screens if preferred,
+           or keep them separate. For this example, keeping separate. */
+        width: 100%;
+        max-width: 800px; /* Align with video if video is also max-width */
+        margin-left: auto; /* Centering if container is wider */
+        margin-right: auto;
+        /* If video-container and channel-list-container are in a row,
+           controls might need to be positioned differently or wrapped
+           within the video-container or another specific layout div.
+           For simplicity, this example keeps controls separate and centered. */
+    }
+}

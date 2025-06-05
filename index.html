@@ -12,10 +12,21 @@
         <div class="player-area">
             <div class="video-container">
                 <video id="iptv-video" controls autoplay width="100%"></video>
+                <div id="loading-spinner" class="loading-overlay" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
             </div>
             <div class="controls-container">
                 <button id="play-pause-btn">Play/Pause</button>
-                <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1">
+                <div class="volume-control">
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1">
+                </div>
+                <div class="quality-selector" style="display: none;">
+                    <label for="quality-select" style="margin-right: 5px;">Quality:</label> <!-- display:none removed -->
+                    <select id="quality-select" style="display: none;">
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
                 <button id="fullscreen-btn">Fullscreen</button>
             </div>
         </div>
@@ -24,6 +35,19 @@
             <ul id="channel-list">
                 <!-- Channels will be populated by JavaScript -->
             </ul>
+            <div id="epg-info-container" style="display: none;">
+                <h3 id="epg-channel-name"></h3>
+                <div id="epg-current-program">
+                    <p class="epg-program-time">Now:</p>
+                    <p id="epg-current-title" class="epg-program-title"></p>
+                    <p id="epg-current-desc" class="epg-program-desc"></p>
+                </div>
+                <div id="epg-next-program">
+                    <p class="epg-program-time">Next:</p>
+                    <p id="epg-next-title" class="epg-program-title"></p>
+                    <p id="epg-next-desc" class="epg-program-desc"></p>
+                </div>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>

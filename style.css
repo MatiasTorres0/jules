@@ -67,6 +67,8 @@ body {
     background-color: #1e1e1e; /* Slightly lighter dark shade */
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 10px; /* Space between items, especially when wrapped */
 }
 
 .controls-container button {
@@ -195,4 +197,122 @@ The provided CSS for .volume-control is ready if you group volume elements.
 video::-webkit-media-controls-panel {
   /* You can style native controls to some extent or hide them if fully custom */
   /* For now, custom controls are separate, so this is less of an issue */
+}
+
+/* Quality Selector Styles */
+.quality-selector {
+    display: flex; /* Use flex to align label and select - JS toggles parent display */
+    align-items: center; /* Vertically center items */
+    gap: 8px; /* Space between label and select */
+    /* visibility is controlled by JS by setting display on this element */
+}
+
+.quality-selector label {
+    /* margin-right: 5px; -- Replaced by gap */
+    font-size: 0.9em;
+    color: #cccccc; /* Light gray for label text */
+}
+
+#quality-select {
+    background-color: #2c2c2c; /* Dark background for select */
+    color: #e0e0e0; /* Light text for select */
+    border: 1px solid #444; /* Subtle border */
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 0.9em;
+    /* visibility is controlled by JS by setting display on this element's parent or this directly */
+}
+
+#quality-select:focus {
+    outline: none;
+    border-color: #007bff; /* Accent color on focus */
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Focus ring */
+}
+
+/* EPG Info Styling */
+#epg-info-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #2a2a2a; /* Slightly different dark shade for EPG box */
+    border-radius: 6px;
+    border: 1px solid #383838;
+}
+
+#epg-channel-name {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #00aaff; /* A distinct accent for EPG channel name */
+    font-size: 1.2em;
+    text-align: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+#epg-current-program,
+#epg-next-program {
+    margin-bottom: 10px;
+}
+
+#epg-current-program:last-child,
+#epg-next-program:last-child {
+    margin-bottom: 0;
+}
+
+.epg-program-time {
+    font-weight: bold;
+    color: #00c8ff; /* Bright accent for time labels like "Now:", "Next:" */
+    font-size: 0.9em;
+    margin-bottom: 4px;
+}
+
+.epg-program-title {
+    font-weight: bold;
+    color: #f0f0f0; /* Main title color */
+    margin-bottom: 3px;
+    font-size: 1em;
+}
+
+.epg-program-desc {
+    font-size: 0.85em;
+    color: #bbbbbb; /* Lighter gray for description */
+    line-height: 1.4;
+    max-height: 4.2em; /* Show about 3 lines of description */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis if description is too long */
+}
+
+/* Ensure channel list container can accommodate EPG info if it grows */
+/* .channel-list-container { */
+    /* ... existing styles ... */
+    /* May need to adjust max-height or ensure it scrolls well if EPG makes it too tall */
+    /* For now, assuming EPG info is compact enough or channel list itself scrolls */
+/* } */
+
+/* Loading Spinner Styles */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Ensure it's above the video element */
+    border-radius: 8px; /* Match video container's border-radius */
+}
+
+.spinner {
+    border: 6px solid #f3f3f3; /* Light grey */
+    border-top: 6px solid #007bff; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

@@ -1,87 +1,162 @@
 body {
-    font-family: sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
     margin: 0;
-    background-color: #f0f0f0;
-    color: #333;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    display: flex;
+    justify-content: center; /* Center main content block */
+    align-items: flex-start; /* Align to top */
+    min-height: 100vh; /* Full viewport height */
+    padding: 20px; /* Add some padding around the page */
+    box-sizing: border-box; /* Include padding in width/height calculations */
 }
 
 .container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 20px;
+    width: 100%;
+    max-width: 1200px; /* Max width for the whole player layout */
+    gap: 20px; /* Space between main sections */
 }
+
+/* Layout for video and channel list side-by-side */
+.player-area {
+    display: flex;
+    flex-direction: column; /* Stack video and controls */
+    flex-grow: 1; /* Takes up available space */
+    gap: 15px;
+}
+
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row; /* Video/controls and channel list side-by-side */
+    }
+    .player-area {
+        flex: 3; /* Video area takes more space */
+    }
+    .channel-list-container {
+        flex: 1; /* Channel list takes less space */
+        max-height: calc(100vh - 40px); /* Full height minus page padding */
+        overflow-y: auto;
+    }
+}
+
 
 .video-container {
     width: 100%;
-    max-width: 800px; /* Limit video width */
     background-color: #000;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative; /* For potential overlays or custom controls */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    overflow: hidden; /* Ensures video corners are rounded if video itself isn't */
 }
 
 #iptv-video {
-    display: block; /* Remove extra space below video */
+    display: block;
+    width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    max-height: 70vh; /* Limit video height */
+    border-radius: 8px; /* Rounded corners for the video element itself */
 }
 
 .controls-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between; /* Distribute controls */
     align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: #fff;
+    padding: 12px 15px;
+    background-color: #1e1e1e; /* Slightly lighter dark shade */
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .controls-container button {
-    padding: 8px 15px;
+    padding: 10px 18px;
     border: none;
     border-radius: 5px;
-    background-color: #007bff;
+    background-color: #007bff; /* Primary accent color */
     color: white;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 0.95em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .controls-container button:hover {
     background-color: #0056b3;
+    transform: translateY(-1px); /* Slight lift on hover */
 }
 
-.controls-container input[type="range"] {
+.controls-container button:active {
+    transform: translateY(0px); /* Press down effect */
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.volume-control input[type="range"] {
     cursor: pointer;
+    width: 100px; /* Adjust width as needed */
+    accent-color: #007bff; /* Modern way to color range sliders */
 }
 
 .channel-list-container {
-    width: 100%;
-    max-width: 800px; /* Match video width */
-    background-color: #fff;
+    background-color: #1e1e1e;
     padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
 }
 
 .channel-list-container h2 {
     margin-top: 0;
+    margin-bottom: 15px;
     text-align: center;
-    color: #007bff;
+    color: #0099ff; /* Brighter accent for headings */
+    font-size: 1.4em;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
 }
 
 #channel-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 300px; /* Limit height and make it scrollable */
-    overflow-y: auto;
+    overflow-y: auto; /* Scroll for overflow */
+    flex-grow: 1; /* Takes available vertical space in flex container */
 }
 
+/* Custom scrollbar for Webkit browsers */
+#channel-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#channel-list::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+#channel-list::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+#channel-list::-webkit-scrollbar-thumb:hover {
+    background: #007bff;
+}
+
+
 #channel-list li {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+    padding: 12px 15px;
+    border-bottom: 1px solid #333; /* Darker separator */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 1em;
+    display: flex; /* For potential icons or indicators */
+    align-items: center;
+    justify-content: space-between;
 }
 
 #channel-list li:last-child {
@@ -89,7 +164,7 @@ body {
 }
 
 #channel-list li:hover {
-    background-color: #e9ecef;
+    background-color: #2c2c2c; /* Hover effect */
 }
 
 #channel-list li.active {
@@ -98,34 +173,26 @@ body {
     font-weight: bold;
 }
 
-/* Basic responsiveness */
-@media (min-width: 768px) {
-    .container {
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 20px;
-    }
+#channel-list li.active:hover {
+    background-color: #0056b3; /* Slightly darker hover for active */
+}
 
-    .video-container {
-        flex: 3; /* Takes more space */
-        margin-bottom: 0;
-    }
+/* Adjusting HTML structure slightly for better control layout (example) */
+/* This requires index.html to be:
+<div class="controls-container">
+    <button id="play-pause-btn">Play</button>
+    <div class="volume-control">
+        <button id="mute-btn">Mute</button> <!-- Example: if you add a mute button -->
+        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1">
+    </div>
+    <button id="fullscreen-btn">Fullscreen</button>
+</div>
+I'll wrap the volume slider in a div for better grouping if needed, but for now, it's separate.
+The provided CSS for .volume-control is ready if you group volume elements.
+*/
 
-    .channel-list-container {
-        flex: 1; /* Takes less space */
-        max-height: 500px; /* Adjust height for desktop */
-    }
-
-    .controls-container {
-        /* Place controls below video on larger screens if preferred,
-           or keep them separate. For this example, keeping separate. */
-        width: 100%;
-        max-width: 800px; /* Align with video if video is also max-width */
-        margin-left: auto; /* Centering if container is wider */
-        margin-right: auto;
-        /* If video-container and channel-list-container are in a row,
-           controls might need to be positioned differently or wrapped
-           within the video-container or another specific layout div.
-           For simplicity, this example keeps controls separate and centered. */
-    }
+/* Ensure video controls are not overridden by custom ones if native are also present */
+video::-webkit-media-controls-panel {
+  /* You can style native controls to some extent or hide them if fully custom */
+  /* For now, custom controls are separate, so this is less of an issue */
 }

@@ -16,7 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const epgNextTitle = document.getElementById('epg-next-title');
     const epgNextDesc = document.getElementById('epg-next-desc');
     const loadingSpinner = document.getElementById('loading-spinner');
+    const epgMessageEl = document.getElementById('epg-message');
+    const epgCurrentProgramDiv = document.getElementById('epg-current-program');
+    const epgNextProgramDiv = document.getElementById('epg-next-program');
+    const seekBackBtn = document.getElementById('seek-back-btn');
+    const goLiveBtn = document.getElementById('go-live-btn');
+    const latencyDisplay = document.getElementById('latency-display');
 
+    let isLiveDvrStream = false;
     let epgData = null;
     const xmltvUrl = 'YOUR_XMLTV_URL_HERE'; // Placeholder - user needs to replace this
 
@@ -74,17 +81,46 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Date(Date.UTC(year, month, day, hours, minutes, seconds));
     }
 
+    }
+
+    function showEPGStatusMessage(message, isError = false) {
+        if (!epgInfoContainer) return;
+
+        epgInfoContainer.style.display = 'block';
+
+        if (epgMessageEl) {
+            epgMessageEl.textContent = message;
+            epgMessageEl.className = isError ? 'epg-message error' : 'epg-message info';
+            epgMessageEl.style.display = 'block';
+        }
+
+        if (epgChannelName) epgChannelName.style.display = 'none';
+        if (epgCurrentProgramDiv) epgCurrentProgramDiv.style.display = 'none';
+        if (epgNextProgramDiv) epgNextProgramDiv.style.display = 'none';
+    }
+
+    function hideEPGStatusMessageAndShowDetails() {
+        if (epgMessageEl) epgMessageEl.style.display = 'none';
+
+        // Visibility of details will be handled by displayEPGForChannel based on data
+        // This function just ensures the general message area is cleared.
+        // It does NOT blindly show all detail sections.
+    }
+
     async function fetchAndParseEPG() {
         if (!xmltvUrl || xmltvUrl === 'YOUR_XMLTV_URL_HERE') {
-            console.warn("XMLTV URL not configured. EPG data will not be loaded.");
-            epgInfoContainer.style.display = 'none';
+            console.warn("XMLTV URL not configured.");
+            showEPGStatusMessage("EPG: Configure XMLTV URL in script.js to see program guide.", false);
+            epgData = null;
             return null;
         }
         try {
+            showEPGStatusMessage("EPG: Loading guide data...", false); // Initial loading message
             const response = await fetch(xmltvUrl);
             if (!response.ok) {
                 console.error(`Failed to fetch EPG data. Status: ${response.status}`);
-                epgInfoContainer.style.display = 'none';
+                showEPGStatusMessage(`EPG: Failed to load data (status: ${response.status}).`, true);
+                epgData = null;
                 return null;
             }
             const xmlText = await response.text();
@@ -122,32 +158,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             epgData = programsByChannel;
             console.log("EPG data loaded and parsed:", epgData);
+            // Clear general EPG status like "Loading..." if data is successfully parsed.
+            // Specific channel messages ("No info for X") are handled by displayEPGForChannel.
+            if (epgMessageEl && epgMessageEl.textContent.startsWith("EPG:")) {
+                 hideEPGStatusMessageAndShowDetails();
+            }
             return epgData;
         } catch (error) {
             console.error("Error fetching or parsing EPG data:", error);
-            epgInfoContainer.style.display = 'none';
+            showEPGStatusMessage("EPG: Error processing guide data.", true);
+            epgData = null;
             return null;
         }
     }
 
     function displayEPGForChannel(channelName, tvgId) {
+        hideEPGStatusMessageAndShowDetails(); // Clear previous messages/details before processing new channel
+
         if (!epgData) {
-            epgInfoContainer.style.display = 'none';
+            showEPGStatusMessage("EPG data not available or not loaded.", false);
             return;
         }
 
         let channelPrograms = null;
-        if (tvgId && epgData[tvgId]) { // Try matching by tvgId first
+        if (tvgId && epgData[tvgId]) {
             channelPrograms = epgData[tvgId];
-        } else { // Fallback to channel name (less reliable)
-            const matchingKey = Object.keys(epgData).find(key => key.toLowerCase() === channelName.toLowerCase());
+        } else {
+            const matchingKey = Object.keys(epgData).find(key =>
+                epgData[key].some(p => p.channelDisplayName && p.channelDisplayName.toLowerCase() === channelName.toLowerCase()) ||
+                key.toLowerCase() === channelName.toLowerCase()
+            );
             if (matchingKey) {
                 channelPrograms = epgData[matchingKey];
             }
         }
 
         if (!channelPrograms || channelPrograms.length === 0) {
-            epgInfoContainer.style.display = 'none';
+            showEPGStatusMessage(`No program information found for "${channelName}".`, false);
             return;
         }
 
@@ -175,43 +222,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        // if still no current program, it means all programs are in the past.
-        // Optionally, show the last played or next day's first program. For now, it will show N/A.
+        // ... (rest of current/next program finding logic remains similar) ...
+        // if still no current program, it means all programs are in the past OR not found for 'now'
 
+        epgInfoContainer.style.display = 'block'; // Make EPG container visible as we might have content
 
-        epgChannelName.textContent = channelName;
-
-        const currentProgramDiv = document.getElementById('epg-current-program');
-        const nextProgramDiv = document.getElementById('epg-next-program');
+        if (epgChannelName) {
+            epgChannelName.textContent = channelName;
+            epgChannelName.style.display = 'block';
+        }
 
         if (currentProgram) {
-            currentProgramDiv.style.display = 'block';
-            epgCurrentTitle.textContent = currentProgram.title;
-            epgCurrentDesc.textContent = currentProgram.description || '';
+            if (epgCurrentProgramDiv) epgCurrentProgramDiv.style.display = 'block';
+            if (epgCurrentTitle) epgCurrentTitle.textContent = currentProgram.title;
+            if (epgCurrentDesc) epgCurrentDesc.textContent = currentProgram.description || '';
         } else {
-            currentProgramDiv.style.display = 'none';
-            epgCurrentTitle.textContent = 'N/A';
-            epgCurrentDesc.textContent = '';
+            if (epgCurrentProgramDiv) epgCurrentProgramDiv.style.display = 'none';
+            if (epgCurrentTitle) epgCurrentTitle.textContent = 'N/A';
         }
 
-        if (nextProgram && nextProgram.start >= (currentProgram ? currentProgram.stop : now)) { // ensure next is truly after current
-            nextProgramDiv.style.display = 'block';
-            epgNextTitle.textContent = nextProgram.title;
-            epgNextDesc.textContent = nextProgram.description || '';
+        if (nextProgram && nextProgram.start >= (currentProgram ? currentProgram.stop : now)) {
+            if (epgNextProgramDiv) epgNextProgramDiv.style.display = 'block';
+            if (epgNextTitle) epgNextTitle.textContent = nextProgram.title;
+            if (epgNextDesc) epgNextDesc.textContent = nextProgram.description || '';
         } else {
-             // If current program exists but no valid next program, clear next program fields
-            if (currentProgram && nextProgram && nextProgram.start < currentProgram.stop) {
-                 nextProgram = null; // Invalidate next program if it overlaps or is before current ends
+            if (epgNextProgramDiv) epgNextProgramDiv.style.display = 'none';
+            if (epgNextTitle) epgNextTitle.textContent = 'N/A';
+        }
+
+        if (!currentProgram && !nextProgram) {
+            // If after all checks, no current or valid next program is found for display
+            showEPGStatusMessage(`No current or upcoming programs for "${channelName}".`, false);
+            // Ensure channel name is hidden if no program info is shown with message
+            if (epgChannelName) epgChannelName.style.display = 'none';
+        } else {
+            // If there is at least one program (current or next), ensure no general message is shown
+             if (epgMessageEl && epgMessageEl.style.display === 'block' && !epgMessageEl.textContent.includes(channelName)) {
+                // Hide general messages if we are about to show specific program details
+                epgMessageEl.style.display = 'none';
             }
-            nextProgramDiv.style.display = 'none';
-            epgNextTitle.textContent = 'N/A';
-            epgNextDesc.textContent = '';
-        }
-
-        if (currentProgram || nextProgram) {
-            epgInfoContainer.style.display = 'block';
-        } else {
-            epgInfoContainer.style.display = 'none';
         }
     }
 
@@ -244,8 +293,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    }
+
+
+    function updateDvrControlsVisibility() {
+        if (!video.hls || !isLiveDvrStream) {
+            if (seekBackBtn) seekBackBtn.style.display = 'none';
+            if (goLiveBtn) goLiveBtn.style.display = 'none';
+            return;
+        }
+
+        const dvrWindowStart = video.seekable.length > 0 ? video.seekable.start(0) : 0;
+        // For live HLS, video.duration can be Infinity. Use seekable.end(0) for the live edge.
+        const dvrWindowEnd = video.seekable.length > 0 ? video.seekable.end(0) : 0;
+        const currentTime = video.currentTime;
+        const liveThreshold = 5; // Seconds behind live edge to still be considered "at live"
+
+        if (seekBackBtn) {
+            if (currentTime > dvrWindowStart + 5) { // Show if more than 5s from absolute start
+                seekBackBtn.style.display = 'inline-block';
+            } else {
+                seekBackBtn.style.display = 'none';
+            }
+        }
+
+        if (goLiveBtn) {
+            if (dvrWindowEnd > 0 && currentTime < dvrWindowEnd - liveThreshold) {
+                goLiveBtn.style.display = 'inline-block';
+                goLiveBtn.classList.remove('at-live-edge');
+                goLiveBtn.disabled = false;
+            } else if (dvrWindowEnd > 0) { // At live edge or very close
+                goLiveBtn.style.display = 'inline-block';
+                goLiveBtn.classList.add('at-live-edge');
+                goLiveBtn.disabled = true;
+            } else { // Should not happen if isLiveDvrStream is true and seekable range is valid
+                 goLiveBtn.style.display = 'none';
+            }
+        }
+    }
+
     function playChannel(index) {
-        if (loadingSpinner) loadingSpinner.style.display = 'flex'; // Show spinner
+        if (loadingSpinner) loadingSpinner.style.display = 'flex';
+        if (latencyDisplay) latencyDisplay.style.display = 'none'; // Hide on new channel load
+        isLiveDvrStream = false; // Reset on channel change
+        updateDvrControlsVisibility(); // Hide DVR buttons initially for new channel
 
         if (index >= 0 && index < channels.length) {
             const channel = channels[index];
@@ -261,6 +352,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                     console.log("HLS Manifest parsed event.");
+
+                    const isLiveStream = data.levels && data.levels.length > 0 && data.levels[0].details && data.levels[0].details.live;
+
                     // Log HLS manifest-derived properties for DVR/replay investigation
                     console.log("--- HLS Manifest Details for DVR/Replay ---");
                     if (data.levels && data.levels.length > 0 && data.levels[0].details) {
@@ -278,27 +372,41 @@ document.addEventListener('DOMContentLoaded', () => {
                      console.log("HLS Config (DVR related example): liveSyncDurationCount:", hls.config.liveSyncDurationCount, "liveMaxLatencyDurationCount:", hls.config.liveMaxLatencyDurationCount);
                      console.log("-------------------------------------------");
 
-                    // Latency-related logging for live streams
-                    if (data.levels && data.levels.length > 0 && data.levels[0].details && data.levels[0].details.live) {
+                    // Latency-related logging and UI update for live streams
+                    if (isLiveStream) {
                         console.log("--- HLS Latency Control Investigation (for LIVE stream) ---");
                         console.log("hls.config.liveSyncDurationCount (target segments from edge):", hls.config.liveSyncDurationCount);
                         console.log("hls.config.liveMaxLatencyDurationCount (max segments before seeking):", hls.config.liveMaxLatencyDurationCount);
                         console.log("hls.config.liveDurationInfinity (manifest #EXT-X-PLAYLIST-TYPE:LIVE):", hls.config.liveDurationInfinity);
                         console.log("hls.config.maxLiveSyncPlaybackRate (playback rate for catchup):", hls.config.maxLiveSyncPlaybackRate);
 
-                        if (typeof hls.latency !== 'undefined') {
-                            console.log("Current HLS.js reported 'hls.latency' (at manifest parse time):", hls.latency.toFixed(3) + "s");
-                        } else {
-                            console.log("'hls.latency' property not directly available on this HLS.js version or at manifest parse stage.");
+                        if (typeof hls.latency === 'number' && latencyDisplay) {
+                            latencyDisplay.textContent = `Latency: ${hls.latency.toFixed(1)}s`;
+                            latencyDisplay.style.display = 'inline';
+                            console.log("Current HLS.js reported 'hls.latency' (at manifest parse time):", hls.latency.toFixed(1) + "s");
+                        } else if (latencyDisplay) {
+                             latencyDisplay.style.display = 'none'; // Hide if not available
+                             console.log("'hls.latency' property not directly available or not a number at manifest parse stage.");
                         }
-                        // Example of listening to an event that might give more dynamic latency related data:
-                        // hls.on(Hls.Events.FRAG_BUFFERED, function(event, eventData) {
-                        //     if (eventData.frag && eventData.frag.stats && typeof hls.latency === 'number') {
-                        //         // Log latency when a fragment is buffered, if available
-                        //         console.log(`HLS Latency (on FRAG_BUFFERED for ${eventData.frag.relurl}): ${hls.latency.toFixed(3)}s`);
-                        //     }
-                        // });
+
+                        hls.on(Hls.Events.FRAG_BUFFERED, function(fragBufferedEvent, fragBufferedData) {
+                            if (hls.streamController && hls.streamController.live && typeof hls.latency === 'number' && latencyDisplay) {
+                                latencyDisplay.textContent = `Latency: ${hls.latency.toFixed(1)}s`;
+                                latencyDisplay.style.display = 'inline';
+                            }
+                        });
+
+                        hls.on(Hls.Events.LEVEL_LOADED, function(levelLoadedEvent, levelLoadedData) {
+                            if (levelLoadedData.details && levelLoadedData.details.live && typeof hls.latency === 'number' && latencyDisplay) {
+                                 latencyDisplay.textContent = `Latency: ${hls.latency.toFixed(1)}s`;
+                                 latencyDisplay.style.display = 'inline';
+                            } else if (latencyDisplay && levelLoadedData.details && !levelLoadedData.details.live) {
+                                 latencyDisplay.style.display = 'none';
+                            }
+                        });
                         console.log("---------------------------------------------------------");
+                    } else { // Not a live HLS stream
+                        if (latencyDisplay) latencyDisplay.style.display = 'none';
                     }
 
                     if (data.levels && data.levels.length > 1) {
@@ -338,14 +446,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 hls.on(Hls.Events.LEVEL_SWITCHED, function (event, data) {
                     if (qualitySelect.style.display !== 'none') {
-                        qualitySelect.value = data.level;
-                        console.log("Switched to quality level index:", data.level);
+                        const newLevelIndex = data.level;
+                        qualitySelect.value = newLevelIndex;
+                        console.log("Switched to quality level index:", newLevelIndex);
+
+                        // Visual feedback for level switch
+                        if (qualitySelect.classList) {
+                            qualitySelect.classList.add('quality-adapted-flash');
+                            setTimeout(() => {
+                                qualitySelect.classList.remove('quality-adapted-flash');
+                            }, 700); // Remove class after 0.7 seconds
+                        }
                     }
                 });
 
-                hls.on(Hls.Events.LOADEDMETADATA, function(event, hlsData) { // Renamed data to hlsData to avoid conflict
+                hls.on(Hls.Events.LOADEDMETADATA, function(event, hlsData) {
                     console.log("HLS LOADEDMETADATA event triggered.");
-                    logVideoSeekableRange(); // Log seekable range when metadata is loaded
+                    logVideoSeekableRange();
+                    // Determine if it's a Live DVR stream based on seekable range and live details
+                    isLiveDvrStream = false; // reset before check
+                    if (video.hls && video.hls.levels && video.hls.levels.length > 0 && video.hls.levels[0].details && video.hls.levels[0].details.live) {
+                        if (video.seekable && video.seekable.length > 0) {
+                            const dvrWindowSize = video.seekable.end(0) - video.seekable.start(0);
+                            if (dvrWindowSize > 60) { // Example: window must be > 60 seconds
+                                isLiveDvrStream = true;
+                                console.log("Live DVR stream detected. Window size:", dvrWindowSize.toFixed(2) + "s");
+                            } else {
+                                console.log("Live stream detected, but DVR window is small or non-existent. Window: " + dvrWindowSize.toFixed(2) + "s");
+                            }
+                        } else {
+                            console.log("Live stream detected, but no seekable ranges reported by video element yet.");
+                        }
+                    } else {
+                        console.log("Not a live HLS stream according to manifest/level details.");
+                    }
+                    updateDvrControlsVisibility(); // Update visibility based on new stream type
                 });
 
                 hls.on(Hls.Events.ERROR, function(event, data) {
@@ -373,6 +508,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     video.hls.destroy();
                     video.hls = null;
                 }
+                if (latencyDisplay) latencyDisplay.style.display = 'none'; // Hide for non-HLS
+                isLiveDvrStream = false; // Ensure flag is false for non-HLS
+                updateDvrControlsVisibility(); // Hide DVR buttons
                 qualitySelectorDiv.style.display = 'none';
                 qualitySelect.style.display = 'none';
                 if (qualityLabel) qualityLabel.style.display = 'none';
@@ -443,11 +581,35 @@ document.addEventListener('DOMContentLoaded', () => {
     playPauseBtn.addEventListener('click', togglePlayPause);
     volumeSlider.addEventListener('input', handleVolumeChange);
     fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    if (seekBackBtn) {
+        seekBackBtn.addEventListener('click', () => {
+            if (video.seekable.length > 0) {
+                // Ensure not seeking before the actual start of the seekable range
+                video.currentTime = Math.max(video.seekable.start(0), video.currentTime - 30);
+            } else { // Fallback for limited scenarios (should not happen if button is visible based on logic)
+                video.currentTime -= 30;
+            }
+        });
+    }
+
+    if (goLiveBtn) {
+        goLiveBtn.addEventListener('click', () => {
+            if (video.seekable.length > 0) {
+                // Seek to near the end of the seekable range for live.
+                // Subtracting a small amount can help avoid issues if the reported edge is *exactly* the last ms.
+                video.currentTime = video.seekable.end(0) - 0.5;
+            }
+            // Consider if HLS.js has a more direct way to go to live for certain stream types
+            // e.g. if (video.hls && typeof video.hls.liveSyncPosition === 'number') video.currentTime = video.hls.liveSyncPosition;
+        });
+    }
+
     video.addEventListener('play', updatePlayPauseButton);
-    video.addEventListener('pause', updatePlayPauseButton); // Spinner could be hidden here too if needed
+    video.addEventListener('pause', updatePlayPauseButton);
     video.addEventListener('ended', updatePlayPauseButton);
     video.addEventListener('volumechange', () => {
-        volumeSlider.value = video.volume; // Sync slider if volume changed elsewhere
+        volumeSlider.value = video.volume;
     });
     video.addEventListener('playing', () => {
         if (loadingSpinner) loadingSpinner.style.display = 'none';
@@ -455,10 +617,23 @@ document.addEventListener('DOMContentLoaded', () => {
     video.addEventListener('error', (e) => {
         console.error("Video element error:", e);
         if (loadingSpinner) loadingSpinner.style.display = 'none';
-        // Optionally, update UI to show a more user-friendly error message
-        updatePlayPauseButton(); // Ensure button state is correct
-        // Could also try to display an error overlay on the video
+        updatePlayPauseButton();
+        isLiveDvrStream = false; // Reset on video error
+        updateDvrControlsVisibility(); // Hide DVR buttons
     });
+    video.addEventListener('loadedmetadata', () => {
+        // This event is for the video element itself.
+        // We use Hls.Events.LOADEDMETADATA for HLS specific logic,
+        // but this can be a fallback or general place for non-HLS duration if needed.
+        // For MP4 files, this is where duration becomes available.
+        // Update DVR controls here too, as non-HLS streams definitely aren't DVR.
+        if (!video.hls) { // If it's not an HLS stream being handled by HLS.js
+            isLiveDvrStream = false;
+            updateDvrControlsVisibility();
+            if (latencyDisplay) latencyDisplay.style.display = 'none'; // Hide for non-HLS on metadata load
+        }
+    });
+    video.addEventListener('timeupdate', updateDvrControlsVisibility);
 
 
     // Initial setup

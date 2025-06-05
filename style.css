@@ -288,6 +288,58 @@ video::-webkit-media-controls-panel {
     /* For now, assuming EPG info is compact enough or channel list itself scrolls */
 /* } */
 
+#quality-select.quality-adapted-flash {
+    transition: background-color 0.2s ease-in-out;
+    background-color: #004a8c; /* A slightly different shade of blue or related accent */
+    /* Or use box-shadow for a glow effect */
+    /* box-shadow: 0 0 8px rgba(0, 123, 255, 0.7); */
+}
+
+#epg-message {
+    padding: 8px 0;
+    text-align: center;
+    font-size: 0.9em;
+    /* display: none; by default in HTML or handled by JS */
+}
+
+#epg-message.info {
+    color: #cccccc; /* Standard info text color */
+}
+
+#epg-message.error {
+    color: #ff6b6b; /* A noticeable error color */
+    font-weight: bold;
+}
+
+#seek-back-btn,
+#go-live-btn {
+    /* Inherits general button styling from .controls-container button by default */
+    /* Specific overrides if needed: */
+    /* padding: 10px 12px; */ /* Slightly adjust if text is wider/shorter */
+}
+
+#go-live-btn {
+    font-weight: bold; /* Make "LIVE" text bold */
+}
+
+#go-live-btn.at-live-edge {
+    /* Style to indicate user is already at the live edge */
+    background-color: #dc3545; /* Example: Red */
+    color: white;
+    /* cursor: default; (if also disabled) */
+}
+
+#latency-display {
+    color: #cccccc; /* Light gray, similar to quality label */
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.1); /* Subtle background */
+    border-radius: 3px;
+    /* display: none; is handled by JS initially and in HTML */
+    /* font-size: 0.85em; (already inline for this subtask) */
+    /* margin-left: auto; (already inline for this subtask) */
+    /* align-self: center; (already inline for this subtask) */
+}
+
 /* Loading Spinner Styles */
 .loading-overlay {
     position: absolute;

@@ -1,94 +1,150 @@
+:root {
+    --primary-bg: #1a1d24; /* Slightly desaturated dark blue */
+    --secondary-bg: #232730; /* Darker shade for elements */
+    --tertiary-bg: #2c313a; /* Hover, active states */
+    --primary-accent: #00aeff; /* Vibrant cyan/blue */
+    --primary-accent-darker: #008cdd; /* For hover on accent elements */
+    --text-primary: #e1e8f0; /* Light grey/blue for text */
+    --text-secondary: #b0bac4; /* Softer text for less emphasis */
+    --text-accent: var(--primary-accent);
+    --border-color: #3a3f4a;
+    --error-color: #ff5252;
+    --live-color: #4caf50; /* Green for live */
+    --live-not-live-color: #f44336; /* Red for not live (on button) */
+
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --font-family-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    --transition-fast: 0.15s ease-in-out;
+    --transition-medium: 0.25s ease-in-out;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
+    font-family: var(--font-family-main);
     margin: 0;
-    background-color: #121212; /* Dark background */
-    color: #e0e0e0; /* Light text */
+    background-color: var(--primary-bg);
+    color: var(--text-primary);
     display: flex;
-    justify-content: center; /* Center main content block */
-    align-items: flex-start; /* Align to top */
-    min-height: 100vh; /* Full viewport height */
-    padding: 20px; /* Add some padding around the page */
-    box-sizing: border-box; /* Include padding in width/height calculations */
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 15px; /* Slightly reduced padding */
+    box-sizing: border-box;
 }
 
 .container {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 1200px; /* Max width for the whole player layout */
-    gap: 20px; /* Space between main sections */
-}
-
-/* Layout for video and channel list side-by-side */
-.player-area {
-    display: flex;
-    flex-direction: column; /* Stack video and controls */
-    flex-grow: 1; /* Takes up available space */
+    max-width: 1280px; /* Slightly increased max-width */
     gap: 15px;
 }
 
-@media (min-width: 768px) {
-    .container {
-        flex-direction: row; /* Video/controls and channel list side-by-side */
-    }
-    .player-area {
-        flex: 3; /* Video area takes more space */
-    }
-    .channel-list-container {
-        flex: 1; /* Channel list takes less space */
-        max-height: calc(100vh - 40px); /* Full height minus page padding */
-        overflow-y: auto;
-    }
+.player-area {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 10px; /* Reduced gap */
 }
 
+@media (min-width: 800px) { /* Adjusted breakpoint */
+    .container {
+        flex-direction: row;
+    }
+    .player-area {
+        flex: 3;
+    }
+    .channel-list-container {
+        flex: 1;
+        max-height: calc(100vh - 30px); /* Adjusted for padding */
+        overflow-y: auto;
+        display: flex; /* To make EPG stick to bottom */
+        flex-direction: column;
+    }
+}
 
 .video-container {
     width: 100%;
     background-color: #000;
-    position: relative; /* For potential overlays or custom controls */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    overflow: hidden; /* Ensures video corners are rounded if video itself isn't */
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
 }
 
 #iptv-video {
     display: block;
     width: 100%;
-    height: auto; /* Maintain aspect ratio */
-    max-height: 70vh; /* Limit video height */
-    border-radius: 8px; /* Rounded corners for the video element itself */
+    height: auto;
+    max-height: calc(100vh - 150px); /* Max height relative to viewport, considering controls etc. */
+    min-height: 200px; /* Ensure a minimum height */
+    border-radius: var(--border-radius-md);
 }
 
 .controls-container {
     display: flex;
-    justify-content: space-between; /* Distribute controls */
+    justify-content: space-between;
     align-items: center;
-    padding: 12px 15px;
-    background-color: #1e1e1e; /* Slightly lighter dark shade */
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-    gap: 10px; /* Space between items, especially when wrapped */
+    padding: 10px 12px;
+    background-color: var(--secondary-bg);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    flex-wrap: wrap;
+    gap: 8px 12px; /* row-gap column-gap */
 }
+
+/* Grouping controls for better layout */
+.controls-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.controls-group.left {
+    flex-grow: 1; /* Pushes other groups to the right if needed */
+}
+.controls-group.center {
+    flex-grow: 2; /* Takes up more space if available */
+    justify-content: center;
+}
+.controls-group.right {
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
 
 .controls-container button {
-    padding: 10px 18px;
+    padding: 8px 12px; /* Adjusted padding */
     border: none;
-    border-radius: 5px;
-    background-color: #007bff; /* Primary accent color */
-    color: white;
+    border-radius: var(--border-radius-sm);
+    background-color: var(--tertiary-bg); /* Button bg */
+    color: var(--text-primary);
     cursor: pointer;
-    font-size: 0.95em;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-size: 0.9em; /* Slightly smaller base font for buttons */
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Space for icon and text if any */
+}
+/* Add styles for icons if you use an icon font or SVGs */
+.controls-container button .icon { /* Example class for an icon */
+    font-size: 1.1em; /* Make icons slightly larger than text */
 }
 
+
 .controls-container button:hover {
-    background-color: #0056b3;
-    transform: translateY(-1px); /* Slight lift on hover */
+    background-color: var(--primary-accent);
+    color: #fff;
+    transform: translateY(-1px);
+}
+.controls-container button:focus-visible {
+    outline: 2px solid var(--primary-accent);
+    outline-offset: 2px;
 }
 
 .controls-container button:active {
-    transform: translateY(0px); /* Press down effect */
+    transform: translateY(0px);
+    background-color: var(--primary-accent-darker);
 }
 
 .volume-control {
@@ -99,245 +155,220 @@ body {
 
 .volume-control input[type="range"] {
     cursor: pointer;
-    width: 100px; /* Adjust width as needed */
-    accent-color: #007bff; /* Modern way to color range sliders */
+    width: 80px; /* Adjusted width */
+    accent-color: var(--primary-accent);
+    transition: width var(--transition-medium); /* Smooth width change on hover if desired */
+}
+.volume-control input[type="range"]:hover {
+    width: 100px; /* Expand on hover */
 }
 
 .channel-list-container {
-    background-color: #1e1e1e;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
+    background-color: var(--secondary-bg);
+    padding: 12px;
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
 
 .channel-list-container h2 {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     text-align: center;
-    color: #0099ff; /* Brighter accent for headings */
-    font-size: 1.4em;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
+    color: var(--text-accent);
+    font-size: 1.25em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
 }
 
 #channel-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    overflow-y: auto; /* Scroll for overflow */
-    flex-grow: 1; /* Takes available vertical space in flex container */
+    overflow-y: auto;
+    flex-grow: 1; /* For EPG placement */
 }
 
 /* Custom scrollbar for Webkit browsers */
 #channel-list::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
-
 #channel-list::-webkit-scrollbar-track {
-    background: #2a2a2a;
-    border-radius: 4px;
+    background: var(--tertiary-bg);
+    border-radius: var(--border-radius-sm);
 }
-
 #channel-list::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
+    background: var(--border-color);
+    border-radius: var(--border-radius-sm);
 }
-
 #channel-list::-webkit-scrollbar-thumb:hover {
-    background: #007bff;
+    background: var(--primary-accent);
 }
-
 
 #channel-list li {
-    padding: 12px 15px;
-    border-bottom: 1px solid #333; /* Darker separator */
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    font-size: 1em;
-    display: flex; /* For potential icons or indicators */
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+    font-size: 0.95em;
+    display: flex;
     align-items: center;
     justify-content: space-between;
+    border-radius: var(--border-radius-sm); /* Add radius to list items */
+    margin-bottom: 2px; /* Small space between items */
 }
-
 #channel-list li:last-child {
     border-bottom: none;
 }
-
 #channel-list li:hover {
-    background-color: #2c2c2c; /* Hover effect */
+    background-color: var(--tertiary-bg);
 }
-
 #channel-list li.active {
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
+    background-color: var(--primary-accent);
+    color: #fff; /* White text on accent */
+    font-weight: 600; /* Slightly bolder */
 }
-
 #channel-list li.active:hover {
-    background-color: #0056b3; /* Slightly darker hover for active */
+    background-color: var(--primary-accent-darker);
+}
+#channel-list li:focus-visible {
+    outline: 2px solid var(--primary-accent);
+    outline-offset: -2px; /* Inside border */
 }
 
-/* Adjusting HTML structure slightly for better control layout (example) */
-/* This requires index.html to be:
-<div class="controls-container">
-    <button id="play-pause-btn">Play</button>
-    <div class="volume-control">
-        <button id="mute-btn">Mute</button> <!-- Example: if you add a mute button -->
-        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1">
-    </div>
-    <button id="fullscreen-btn">Fullscreen</button>
-</div>
-I'll wrap the volume slider in a div for better grouping if needed, but for now, it's separate.
-The provided CSS for .volume-control is ready if you group volume elements.
-*/
-
-/* Ensure video controls are not overridden by custom ones if native are also present */
-video::-webkit-media-controls-panel {
-  /* You can style native controls to some extent or hide them if fully custom */
-  /* For now, custom controls are separate, so this is less of an issue */
-}
 
 /* Quality Selector Styles */
 .quality-selector {
-    display: flex; /* Use flex to align label and select - JS toggles parent display */
-    align-items: center; /* Vertically center items */
-    gap: 8px; /* Space between label and select */
-    /* visibility is controlled by JS by setting display on this element */
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
-
 .quality-selector label {
-    /* margin-right: 5px; -- Replaced by gap */
-    font-size: 0.9em;
-    color: #cccccc; /* Light gray for label text */
+    font-size: 0.85em;
+    color: var(--text-secondary);
 }
-
 #quality-select {
-    background-color: #2c2c2c; /* Dark background for select */
-    color: #e0e0e0; /* Light text for select */
-    border: 1px solid #444; /* Subtle border */
-    border-radius: 4px;
+    background-color: var(--tertiary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     padding: 6px 8px;
-    font-size: 0.9em;
-    /* visibility is controlled by JS by setting display on this element's parent or this directly */
+    font-size: 0.85em;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-
+#quality-select:hover {
+    border-color: var(--primary-accent);
+}
 #quality-select:focus {
     outline: none;
-    border-color: #007bff; /* Accent color on focus */
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Focus ring */
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 2px var(--primary-accent-darker);
 }
+#quality-select.quality-adapted-flash {
+    transition: background-color 0.1s ease-in-out;
+    background-color: var(--primary-accent-darker);
+}
+
 
 /* EPG Info Styling */
 #epg-info-container {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #2a2a2a; /* Slightly different dark shade for EPG box */
-    border-radius: 6px;
-    border: 1px solid #383838;
+    margin-top: 15px; /* Space above EPG */
+    padding: 12px;
+    background-color: var(--tertiary-bg);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+    /* flex-shrink: 0; To prevent shrinking if channel list is very long */
 }
-
 #epg-channel-name {
     margin-top: 0;
-    margin-bottom: 12px;
-    color: #00aaff; /* A distinct accent for EPG channel name */
-    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: var(--text-accent);
+    font-size: 1.1em;
     text-align: center;
-    border-bottom: 1px solid #444;
-    padding-bottom: 8px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 6px;
 }
-
 #epg-current-program,
 #epg-next-program {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    padding: 8px;
+    background-color: var(--secondary-bg); /* Card-like bg for programs */
+    border-radius: var(--border-radius-sm);
 }
-
 #epg-current-program:last-child,
 #epg-next-program:last-child {
     margin-bottom: 0;
 }
-
 .epg-program-time {
-    font-weight: bold;
-    color: #00c8ff; /* Bright accent for time labels like "Now:", "Next:" */
-    font-size: 0.9em;
-    margin-bottom: 4px;
-}
-
-.epg-program-title {
-    font-weight: bold;
-    color: #f0f0f0; /* Main title color */
+    font-weight: 600;
+    color: var(--text-accent);
+    font-size: 0.8em;
     margin-bottom: 3px;
-    font-size: 1em;
+    text-transform: uppercase;
 }
-
+.epg-program-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    font-size: 0.95em;
+}
 .epg-program-desc {
-    font-size: 0.85em;
-    color: #bbbbbb; /* Lighter gray for description */
-    line-height: 1.4;
-    max-height: 4.2em; /* Show about 3 lines of description */
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    max-height: calc(1.45em * 3); /* Approx 3 lines */
     overflow: hidden;
-    text-overflow: ellipsis; /* Add ellipsis if description is too long */
-}
-
-/* Ensure channel list container can accommodate EPG info if it grows */
-/* .channel-list-container { */
-    /* ... existing styles ... */
-    /* May need to adjust max-height or ensure it scrolls well if EPG makes it too tall */
-    /* For now, assuming EPG info is compact enough or channel list itself scrolls */
-/* } */
-
-#quality-select.quality-adapted-flash {
-    transition: background-color 0.2s ease-in-out;
-    background-color: #004a8c; /* A slightly different shade of blue or related accent */
-    /* Or use box-shadow for a glow effect */
-    /* box-shadow: 0 0 8px rgba(0, 123, 255, 0.7); */
+    text-overflow: ellipsis;
+    /* display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; */ /* For multiline ellipsis if needed */
 }
 
 #epg-message {
-    padding: 8px 0;
+    padding: 10px;
     text-align: center;
     font-size: 0.9em;
-    /* display: none; by default in HTML or handled by JS */
+    background-color: var(--tertiary-bg);
+    border-radius: var(--border-radius-sm);
 }
-
 #epg-message.info {
-    color: #cccccc; /* Standard info text color */
+    color: var(--text-secondary);
 }
-
 #epg-message.error {
-    color: #ff6b6b; /* A noticeable error color */
-    font-weight: bold;
+    color: var(--error-color);
+    font-weight: 500;
 }
 
+/* Buttons: Seek, Live */
 #seek-back-btn,
 #go-live-btn {
-    /* Inherits general button styling from .controls-container button by default */
-    /* Specific overrides if needed: */
-    /* padding: 10px 12px; */ /* Slightly adjust if text is wider/shorter */
+    /* General button styles are inherited */
 }
-
 #go-live-btn {
-    font-weight: bold; /* Make "LIVE" text bold */
+    /* Default style for "not live" or when seekable */
+    background-color: var(--tertiary-bg); /* Default button color */
+    color: var(--text-primary);
+    border: 1px solid var(--primary-accent); /* Accent border to draw attention */
+}
+#go-live-btn.at-live-edge {
+    background-color: var(--live-color); /* Green when at live */
+    color: white;
+    border-color: var(--live-color);
+    /* cursor: default; /* if also disabled */
+}
+#go-live-btn.at-live-edge:hover {
+    background-color: #388e3c; /* Darker green */
+}
+#go-live-btn:not(.at-live-edge):hover {
+     background-color: var(--primary-accent);
+     color: white;
 }
 
-#go-live-btn.at-live-edge {
-    /* Style to indicate user is already at the live edge */
-    background-color: #dc3545; /* Example: Red */
-    color: white;
-    /* cursor: default; (if also disabled) */
-}
 
 #latency-display {
-    color: #cccccc; /* Light gray, similar to quality label */
-    padding: 5px 10px;
-    background-color: rgba(0, 0, 0, 0.1); /* Subtle background */
-    border-radius: 3px;
-    /* display: none; is handled by JS initially and in HTML */
-    /* font-size: 0.85em; (already inline for this subtask) */
-    /* margin-left: auto; (already inline for this subtask) */
-    /* align-self: center; (already inline for this subtask) */
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8em;
 }
 
 /* Loading Spinner Styles */
@@ -347,24 +378,69 @@ video::-webkit-media-controls-panel {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
+    background-color: rgba(26, 29, 36, 0.75); /* Use primary-bg with alpha */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10; /* Ensure it's above the video element */
-    border-radius: 8px; /* Match video container's border-radius */
+    z-index: 1000; /* High z-index */
+    border-radius: var(--border-radius-md);
+    backdrop-filter: blur(2px); /* Optional: blur background */
 }
-
 .spinner {
-    border: 6px solid #f3f3f3; /* Light grey */
-    border-top: 6px solid #007bff; /* Blue */
+    border: 4px solid rgba(225, 232, 240, 0.2); /* Light border for spinner track */
+    border-top: 4px solid var(--primary-accent); /* Accent color for spinner */
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
+    width: 40px;
+    height: 40px;
+    animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+/* Focus visible polyfill might be needed for older browsers if :focus-visible is not enough */
+button:focus, input[type="range"]:focus, select:focus, li:focus {
+    outline: none; /* Remove default outline if using :focus-visible */
+}
+
+/* Tooltip (basic example, can be enhanced with JS) */
+[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%; /* Position above the element */
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 5px; /* Space between element and tooltip */
+    padding: 5px 8px;
+    background-color: #333;
+    color: #fff;
+    font-size: 0.8em;
+    border-radius: var(--border-radius-sm);
+    white-space: nowrap;
+    z-index: 1001; /* Above spinner if active */
+    opacity: 0; /* Hidden by default */
+    transition: opacity var(--transition-fast);
+}
+[title]:hover::after { /* Show on hover */
+    opacity: 1;
+}
+/* Hide native title attribute to prevent double tooltips */
+[title] {
+    position: relative; /* Needed for ::after positioning */
+}
+
+/* Specific icon button styling (if not using text) */
+.icon-button {
+    font-size: 1.1em; /* Adjust icon size within button */
+    padding: 8px; /* Make padding more square-ish for icon buttons */
+}
+.icon-button .button-text { /* Hide text if only icon is desired */
+    display: none; /* Or use a screen-reader only class */
 }

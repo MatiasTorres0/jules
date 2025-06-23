@@ -17,28 +17,39 @@
                 </div>
             </div>
             <div class="controls-container">
-                <button id="play-pause-btn" title="Play/Pause">Play</button>
-                <div class="volume-control">
-                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" title="Volume">
+                <div class="controls-group left">
+                    <button id="play-pause-btn" title="Play/Pause" aria-label="Play or Pause Video">Play</button>
+                    <!-- Consider adding icons here later e.g. <i class="icon play-icon"></i> <span class="button-text sr-only">Play</span> -->
+                    <button id="seek-back-btn" title="Seek Back 30s" style="display: none;" aria-label="Seek back 30 seconds">&laquo; 30s</button>
+                    <button id="go-live-btn" title="Go Live" style="display: none;" aria-label="Go to live broadcast">LIVE</button>
                 </div>
-                <div class="quality-selector" style="display: none;">
-                    <label for="quality-select" style="margin-right: 5px;">Quality:</label>
-                    <select id="quality-select" style="display: none;" title="Select Quality">
-                        <!-- Options will be populated by JavaScript -->
-                    </select>
+
+                <div class="controls-group center">
+                    <!-- This group can be used for a timeline/scrubber in the future -->
+                    <span id="latency-display" style="display: none; font-size: 0.85em; align-self: center;"></span>
                 </div>
-                <button id="seek-back-btn" title="Seek Back 30s" style="display: none;">&laquo; 30s</button>
-                <button id="go-live-btn" title="Go Live" style="display: none;">LIVE</button>
-                <span id="latency-display" style="display: none; font-size: 0.85em; margin-left: auto; align-self: center;"></span>
-                <button id="fullscreen-btn" title="Toggle Fullscreen">Fullscreen</button>
+
+                <div class="controls-group right">
+                    <div class="quality-selector" style="display: none;">
+                        <label for="quality-select" style="margin-right: 5px;">Quality:</label>
+                        <select id="quality-select" style="display: none;" title="Select Quality" aria-label="Select video quality">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="volume-control">
+                        <!-- Consider adding mute button icon here -->
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" title="Volume" aria-label="Volume control">
+                    </div>
+                    <button id="fullscreen-btn" title="Toggle Fullscreen" aria-label="Toggle fullscreen mode">Fullscreen</button>
+                </div>
             </div>
         </main>
         <aside class="channel-list-container">
             <h2>Channel List</h2>
-            <ul id="channel-list">
-                <!-- Channels will be populated by JavaScript -->
+            <ul id="channel-list" role="listbox" aria-label="Channel list">
+                <!-- Channels will be populated by JavaScript (li elements should have role="option") -->
             </ul>
-            <div id="epg-info-container" style="display: none;">
+            <div id="epg-info-container" style="display: none;" role="region" aria-live="polite" aria-atomic="true">
                 <h3 id="epg-channel-name" style="display: none;"></h3>
                 <p id="epg-message" style="display: none;"></p> <!-- For status/error messages -->
                 <div id="epg-current-program" style="display: none;">
@@ -52,7 +63,7 @@
                     <p id="epg-next-desc" class="epg-program-desc"></p>
                 </div>
             </div>
-        </div>
+        </aside> <!-- Corrected closing tag placement -->
     </div>
     <script src="script.js"></script>
 </body>
